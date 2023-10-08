@@ -1,0 +1,41 @@
+version: "3.8"
+services:
+  dev-db:
+    container_name: "postgres_db"
+    image: postgres:15-alpine
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    networks:
+      - microservice
+
+  rabbitmq:
+    container_name: "rabbitmq"
+    image: rabbitmq:3.12-management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - microservice
+    volumes:
+      - /var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: password
+      RABBITMQ_USER: user
+      RABBITMQ_PASS: password
+      RABBITMQ_HOST: localhost:5672
+      RABBITMQ_AUTH_QUEUE: auth_queue
+
+  redis-db:
+    container_name: "redis_db"
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+    networks:
+      - microservice
+
+networks:
+  microservice:
