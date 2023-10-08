@@ -19,6 +19,6 @@ export class AuthController {
     const message = ctx.getMessage();
     channel.ack(message);
 
-    return { channel, message };
+    return { user: 'user' };
   }
 }

@@ -8,8 +8,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AuthModule);
   const configService = app.get(ConfigService);
 
-  const user = configService.get('RABBITMQ_USER');
-  const pass = configService.get('RABBITMQ_PASS');
+  const user = configService.get('RABBITMQ_DEFAULT_USER');
+  const pass = configService.get('RABBITMQ_DEFAULT_PASS');
   const host = configService.get('RABBITMQ_HOST');
   const queue = configService.get('RABBITMQ_AUTH_QUEUE');
 

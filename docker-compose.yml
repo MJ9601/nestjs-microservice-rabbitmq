@@ -5,9 +5,8 @@ services:
     image: postgres:15-alpine
     ports:
       - 5432:5432
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+    env_file:
+      - /api/.env
     networks:
       - microservice
 
@@ -17,25 +16,65 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
-    networks:
-      - microservice
     volumes:
       - /var/lib/rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: root
-      RABBITMQ_DEFAULT_PASS: password
-      RABBITMQ_USER: user
-      RABBITMQ_PASS: password
-      RABBITMQ_HOST: localhost:5672
-      RABBITMQ_AUTH_QUEUE: auth_queue
+    env_file:
+      - /api/.env
+    networks:
+      - microservice
 
   redis-db:
     container_name: "redis_db"
     image: redis:7-alpine
     ports:
       - 6379:6379
+    env_file:
+      - /api/.env
     networks:
       - microservice
+
+  pgAdmin4:
+    image: dpage/pgadmin4
+    container_name: pgAdmin
+    ports:
+      - 5000:80
+    env_file:
+      - /api/.env
+    networks:
+      - microservice
+    # environment:
+    #   - PGADMIN_DEFAULT_EMAIL=root@mail.com
+    #   - PGADMIN_DEFAULT_PASSWORD=password
+
+  # auth:
+  #   container_name: auth-microservice
+  #   build:
+  #     context: ./api
+  #     dockerfile: ./apps/auth/Dockerfile
+  #   env_file:
+  #     - /api/.env
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   command: yarn start:dev auth
+  #   networks:
+  #     - microservice
+
+  # api:
+  #   container_name: api-geteway
+  #   build:
+  #     context: ./api
+  #     dockerfile: ./apps/api/Dockerfile
+  #   env_file:
+  #     - /api/.env
+  #   ports:
+  #     - 4000:4000
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   command: yarn start:dev api
+  #   networks:
+  #     - microservice
 
 networks:
   microservice:
