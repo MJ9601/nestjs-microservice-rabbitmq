@@ -21,6 +21,7 @@
     "dev:containers:rm": "docker compose rm -s -f -v",
     "dev:containers:up:d": "docker compose up -d",
     "dev:containers:up": "docker compose up",
+    "containers:restart:d": "yarn dev:containers:rm && yarn dev:containers:up:d",
     "containers:restart": "yarn dev:containers:rm && yarn dev:containers:up"
   },
   "dependencies": {
