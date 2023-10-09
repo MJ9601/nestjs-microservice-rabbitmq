@@ -19,8 +19,10 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/api/test/jest-e2e.json",
     "dev:containers:rm": "docker compose rm -s -f -v",
-    "dev:containers:up": "docker compose up -d",
-    "containers:restart": "yarn dev:containers:rm && yarn dev:containers:up"
+    "dev:containers:up:d": "docker compose up -d",
+    "dev:containers:up": "docker compose up",
+    "containers:restart": "yarn dev:containers:rm && yarn dev:containers:up",
+    "containers:restart:d": "yarn dev:containers:rm && yarn dev:containers:up:d"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

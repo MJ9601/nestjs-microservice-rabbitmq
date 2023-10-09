@@ -4,6 +4,8 @@ import { AuthService } from './auth.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../typeorm/entities/user.entity';
+import { PostgresDBModule } from '@app/shared/postgesDb.module';
+import { SharedModule } from '@app/shared';
 
 @Module({
   imports: [
@@ -11,22 +13,9 @@ import { UserEntity } from '../typeorm/entities/user.entity';
       isGlobal: true,
       envFilePath: './.env',
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        port: configService.get('POSTGRES_PORT'),
-        database: configService.get('POSTGRES_DB'),
-        username: configService.get('POSTGRES_USER'),
-        password: configService.get('POSTGRES_PASSWORD'),
-        host: 'postgres_db',
-        autoLoadEntities: true,
-        synchronize: true,
-        entities: [UserEntity],
-      }),
-      inject: [ConfigService],
-    }),
+    PostgresDBModule,
     TypeOrmModule.forFeature([UserEntity]),
+    SharedModule,
   ],
 
   controllers: [AuthController],

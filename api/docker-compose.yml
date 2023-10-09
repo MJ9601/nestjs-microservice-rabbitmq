@@ -9,6 +9,8 @@ services:
       - .env
     networks:
       - microservice
+    volumes:
+      - ./db/data:/var/lib/posgresql/data
 
   rabbitmq:
     container_name: 'rabbitmq'
@@ -60,6 +62,23 @@ services:
     networks:
       - microservice
 
+  product:
+    container_name: product-microservice
+    build:
+      context: ./
+      dockerfile: ./apps/product/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - dev-db
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: yarn start:dev product
+    networks:
+      - microservice
+
   api:
     container_name: api-geteway
     build:
@@ -75,6 +94,7 @@ services:
     depends_on:
       - rabbitmq
       - auth
+      - product
     command: yarn start:dev api
     networks:
       - microservice
