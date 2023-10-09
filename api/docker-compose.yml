@@ -1,0 +1,83 @@
+version: '3.8'
+services:
+  dev-db:
+    container_name: 'postgres_db'
+    image: postgres:15-alpine
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    networks:
+      - microservice
+
+  rabbitmq:
+    container_name: 'rabbitmq'
+    image: rabbitmq:3.12-management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - /var/lib/rabbitmq
+    env_file:
+      - .env
+    networks:
+      - microservice
+
+  redis-db:
+    container_name: 'redis_db'
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+    env_file:
+      - .env
+    networks:
+      - microservice
+
+  pgAdmin4:
+    image: dpage/pgadmin4
+    container_name: pgAdmin
+    ports:
+      - 5000:80
+    env_file:
+      - .env
+    networks:
+      - microservice
+
+  auth:
+    container_name: auth-microservice
+    build:
+      context: ./
+      dockerfile: ./apps/auth/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - dev-db
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: yarn start:dev auth
+    networks:
+      - microservice
+
+  api:
+    container_name: api-geteway
+    build:
+      context: ./
+      dockerfile: ./apps/api/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - 5555:4000
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - rabbitmq
+      - auth
+    command: yarn start:dev api
+    networks:
+      - microservice
+
+networks:
+  microservice:
