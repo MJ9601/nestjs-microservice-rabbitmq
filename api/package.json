@@ -22,7 +22,14 @@
     "dev:containers:up:d": "docker compose up -d",
     "dev:containers:up": "docker compose up",
     "containers:restart:d": "yarn dev:containers:rm && yarn dev:containers:up:d",
-    "containers:restart": "yarn dev:containers:rm && yarn dev:containers:up"
+    "containers:restart": "yarn dev:containers:rm && yarn dev:containers:up",
+    "build:api": "nest build api",
+    "build:auth": "nest build auth",
+    "build:mc": "yarn build:api && yarn build:auth",
+    "auth:typeorm": "npx typeorm -d ./dist/apps/auth/db/data-source.js",
+    "generate:migration": "yarn auth:typeorm migration:generate",
+    "run:migration": "yarn auth:typeorm migration:run",
+    "revert:migration": "yarn auth:typeorm migration:revert"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

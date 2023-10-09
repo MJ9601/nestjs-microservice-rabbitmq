@@ -8,7 +8,6 @@ import {
   Body,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { CreateUserDto } from 'apps/auth/dtos/CreateUser.dto';
 
 @Controller('api')
 export class AppController {
@@ -27,7 +26,7 @@ export class AppController {
   }
 
   @Post('auth')
-  async createUser(@Body() input: CreateUserDto) {
+  async createUser(@Body() input: any) {
     return this.authService.send(
       {
         cmd: 'post-user',
