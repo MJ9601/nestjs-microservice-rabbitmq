@@ -9,7 +9,7 @@ export class SharedService {
   getRmqOptions(queue: string): RmqOptions {
     const user = this.configService.get('RABBITMQ_DEFAULT_USER');
     const pass = this.configService.get('RABBITMQ_DEFAULT_PASS');
-    const host = this.configService.get('RABBITMQ_HOST');
+    const host = this.configService.get('RABBITMQ_HOST_DEV');
     return {
       transport: Transport.RMQ,
       options: {
@@ -28,7 +28,6 @@ export class SharedService {
     const originMsg = ctx.getMessage();
     const getPattern = ctx.getPattern();
     const getArgs = ctx.getArgs();
-    console.log({ getPattern, getArgs });
     channel.ack(originMsg);
   }
 }

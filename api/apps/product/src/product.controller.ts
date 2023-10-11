@@ -20,6 +20,8 @@ export class ProductController {
   async creatUser(@Ctx() ctx: RmqContext) {
     this.sharedService.sendRmqAck(ctx);
 
+    console.log('rest');
+
     return this.productService.createNewProduct({
       name: 'test',
       description: 'this is a test description',

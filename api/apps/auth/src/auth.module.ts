@@ -4,8 +4,7 @@ import { AuthService } from './auth.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../typeorm/entities/user.entity';
-import { PostgresDBModule } from '@app/shared/postgesDb.module';
-import { SharedModule } from '@app/shared';
+import { SharedModule, PostgresDBModule } from '@app/shared';
 
 @Module({
   imports: [
