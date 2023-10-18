@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from '../typeorm/entities/user.entity';
-import { SharedModule, PostgresDBModule } from '@app/shared';
+import { SharedModule, PostgresDBModule, UserEntity } from '@app/shared';
+import { JwtModule } from '@nestjs/jwt/dist';
 
 @Module({
   imports: [
@@ -15,6 +15,7 @@ import { SharedModule, PostgresDBModule } from '@app/shared';
     PostgresDBModule,
     TypeOrmModule.forFeature([UserEntity]),
     SharedModule,
+    JwtModule,
   ],
 
   controllers: [AuthController],

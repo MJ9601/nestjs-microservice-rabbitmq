@@ -5,7 +5,7 @@ export class CreateProductDto {
 
   description: string;
 
-  userId?: number;
+  userId: number;
 
   imageUrl?: string;
 

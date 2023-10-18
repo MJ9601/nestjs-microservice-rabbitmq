@@ -1,3 +1,4 @@
+import { CreateProductDto, CreateUserDto, LoginDto } from '@app/shared';
 import {
   Controller,
   Get,
@@ -6,6 +7,8 @@ import {
   Put,
   Delete,
   Body,
+  Query,
+  Param,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
@@ -20,19 +23,79 @@ export class AppController {
   async getUsers() {
     return this.authService.send(
       {
-        cmd: 'get-users',
+        cmd: 'getUsers',
       },
       {},
     );
   }
 
-  @Post('auth')
-  async createUser(@Body() input: any) {
+  @Post('auth/register')
+  async createUser(@Body() input: CreateUserDto) {
     return this.authService.send(
       {
-        cmd: 'post-user',
+        cmd: 'registerUser',
       },
       input,
+    );
+  }
+
+  @Post('auth/login')
+  async login(@Body() input: LoginDto) {
+    return this.authService.send(
+      {
+        cmd: 'login',
+      },
+      input,
+    );
+  }
+
+  @Get('auth/users/:id')
+  async getUserById(@Param('id') id: number) {
+    return this.authService.send(
+      {
+        cmd: 'getUserById',
+      },
+      { id },
+    );
+  }
+
+  @Delete('auth/users')
+  async delUserById(@Body() input: LoginDto) {
+    return this.authService.send(
+      {
+        cmd: 'delUserByHimself',
+      },
+      input,
+    );
+  }
+
+  @Delete('auth/users/:id')
+  async delUserByAdmin(@Param('id') id: number) {
+    return this.authService.send(
+      {
+        cmd: 'delUserByAdmin',
+      },
+      { id },
+    );
+  }
+
+  @Post('auth/users')
+  async updateUserInfos(@Body() input: CreateUserDto) {
+    return this.authService.send(
+      {
+        cmd: 'updateUserInfo',
+      },
+      input,
+    );
+  }
+
+  @Delete('auth/delete/allUsers')
+  async flushingUserCol() {
+    return this.authService.send(
+      {
+        cmd: 'flushingUserColumn',
+      },
+      {},
     );
   }
 
@@ -46,13 +109,16 @@ export class AppController {
     );
   }
 
-  @Post('product')
-  async createProduct(@Body() input: any) {
+  @Post('product/:userId')
+  async createProduct(
+    @Body() input: Omit<CreateProductDto, 'userId'>,
+    @Param('userId') userId: number,
+  ) {
     return this.productService.send(
       {
         cmd: 'post-product',
       },
-      input,
+      { ...input, userId },
     );
   }
 }

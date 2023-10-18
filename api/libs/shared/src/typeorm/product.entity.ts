@@ -11,7 +11,7 @@ export class ProductEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @PrimaryColumn('varchar', { length: 50 })
+  @PrimaryColumn('varchar', { length: 50, unique: true })
   urlParam: string;
 
   @Column('varchar', { length: 50 })

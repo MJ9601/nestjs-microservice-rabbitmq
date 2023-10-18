@@ -1,9 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, HttpException, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { MessagePattern } from '@nestjs/microservices';
-import { Ctx } from '@nestjs/microservices/decorators';
+import { Ctx, Payload } from '@nestjs/microservices/decorators';
 import { RmqContext } from '@nestjs/microservices/ctx-host';
-import { SharedService } from '@app/shared';
+import { CreateUserDto, SharedService, LoginDto } from '@app/shared';
 
 @Controller()
 export class AuthController {
@@ -12,20 +12,104 @@ export class AuthController {
     private readonly sharedService: SharedService,
   ) {}
 
-  @MessagePattern({ cmd: 'get-users' })
+  @MessagePattern({ cmd: 'getUsers' })
   async getUser(@Ctx() ctx: RmqContext) {
-    this.sharedService.sendRmqAck(ctx);
-    return this.authService.getUsers();
+    try {
+      this.sharedService.sendRmqAck(ctx);
+      return this.authService.getUsers();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  @MessagePattern({ cmd: 'post-user' })
-  async creatUser(@Ctx() ctx: RmqContext) {
-    this.sharedService.sendRmqAck(ctx);
+  @MessagePattern({ cmd: 'registerUser' })
+  async creatUser(@Ctx() ctx: RmqContext, @Payload() payload: CreateUserDto) {
+    try {
+      this.sharedService.sendRmqAck(ctx);
 
-    return this.authService.createUser({
-      name: 'test',
-      email: 'mail@mail.com',
-      password: '0003',
-    });
+      return this.authService.createUser(payload);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @MessagePattern({ cmd: 'login' })
+  async loginUser(@Ctx() ctx: RmqContext, @Payload() payload: LoginDto) {
+    try {
+      this.sharedService.sendRmqAck(ctx);
+
+      return this.authService.varifiedUserInfo(payload);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @MessagePattern({ cmd: 'getUserById' })
+  async getUserById(
+    @Ctx() ctx: RmqContext,
+    @Payload() payload: { id: number },
+  ) {
+    try {
+      this.sharedService.sendRmqAck(ctx);
+
+      return this.authService.getUserById(payload.id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @MessagePattern({ cmd: 'delUserByHimself' })
+  async removeUserByHimself(
+    @Ctx() ctx: RmqContext,
+    @Payload() payload: LoginDto,
+  ) {
+    try {
+      this.sharedService.sendRmqAck(ctx);
+
+      return this.authService.delUserByHimself(payload);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @MessagePattern({ cmd: 'delUserByAmin' })
+  async removeUserByAdmin(
+    @Ctx() ctx: RmqContext,
+    @Payload() payload: { id: number },
+  ) {
+    try {
+      this.sharedService.sendRmqAck(ctx);
+
+      return this.authService.delUserByAdmin(payload.id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @MessagePattern({ cmd: 'updateUserInfo' })
+  async updateUserInfo(
+    @Ctx() ctx: RmqContext,
+    @Payload() payload: CreateUserDto,
+  ) {
+    try {
+      this.sharedService.sendRmqAck(ctx);
+
+      return this.authService.updateUserByHimself(payload);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @MessagePattern({ cmd: 'flushingUserColumn' })
+  async flushingUserCol(@Ctx() ctx: RmqContext) {
+    try {
+      this.sharedService.sendRmqAck(ctx);
+
+      const del = await this.authService.flushingUserColumn();
+
+      return { succeeded: del };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
