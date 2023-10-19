@@ -1,4 +1,9 @@
-import { Controller, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  HttpException,
+  HttpStatus,
+  ConflictException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { Ctx, Payload } from '@nestjs/microservices/decorators';
@@ -27,7 +32,13 @@ export class AuthController {
     try {
       this.sharedService.sendRmqAck(ctx);
 
-      return this.authService.createUser(payload);
+      console.log(payload);
+
+      const newUser = await this.authService.createUser(payload);
+
+      if (!newUser) throw new ConflictException('Invalid Email or Password!!');
+
+      return newUser;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }

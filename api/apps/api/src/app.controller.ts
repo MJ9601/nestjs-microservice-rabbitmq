@@ -9,10 +9,12 @@ import {
   Body,
   Query,
   Param,
+  Res,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { Response } from 'express';
 
-@Controller('api')
+@Controller()
 export class AppController {
   constructor(
     @Inject('AUTH_SERVICE') private readonly authService: ClientProxy,
@@ -31,6 +33,7 @@ export class AppController {
 
   @Post('auth/register')
   async createUser(@Body() input: CreateUserDto) {
+    console.log(input);
     return this.authService.send(
       {
         cmd: 'registerUser',
@@ -40,13 +43,20 @@ export class AppController {
   }
 
   @Post('auth/login')
-  async login(@Body() input: LoginDto) {
-    return this.authService.send(
+  async login(
+    @Body() input: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token = this.authService.send(
       {
         cmd: 'login',
       },
       input,
     );
+
+    console.log(token);
+    return;
+    // res.cookie("accessToken", token)
   }
 
   @Get('auth/users/:id')

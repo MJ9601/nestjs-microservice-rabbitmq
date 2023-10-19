@@ -32,8 +32,14 @@ export class AuthService {
     const user = await this.getUserByEmail(input.email);
     if (user) return false;
 
+    console.log('test-- 35');
+
     const { password, ...rest } = input;
+    console.log({ input, rest, password });
     const hash = await argon.hash(password);
+    console.log(hash);
+
+    console.log('test -- 40');
 
     const newUser = this.userRepository.create({
       ...rest,
@@ -59,12 +65,12 @@ export class AuthService {
     const user = await this.varifiedUserInfo(input);
     if (!user) return false;
 
-    const jwtToken = await this.jwtService.signAsync(user, {
+    const accessToken = await this.jwtService.signAsync(user, {
       secret: this.configService.get('JWT_SECRET'),
-      expiresIn: '60m',
+      expiresIn: '1d',
     });
 
-    return { jwtToken };
+    return { accessToken };
   }
 
   async delUserByHimself(input: LoginDto) {
