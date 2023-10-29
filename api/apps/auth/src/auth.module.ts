@@ -15,7 +15,7 @@ import { JwtModule } from '@nestjs/jwt/dist';
     PostgresDBModule,
     TypeOrmModule.forFeature([UserEntity]),
     SharedModule,
-    JwtModule,
+    JwtModule.register({}),
   ],
 
   controllers: [AuthController],

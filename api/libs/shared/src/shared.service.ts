@@ -26,8 +26,6 @@ export class SharedService {
   sendRmqAck(ctx: RmqContext) {
     const channel = ctx.getChannelRef();
     const originMsg = ctx.getMessage();
-    const getPattern = ctx.getPattern();
-    const getArgs = ctx.getArgs();
     channel.ack(originMsg);
   }
 }

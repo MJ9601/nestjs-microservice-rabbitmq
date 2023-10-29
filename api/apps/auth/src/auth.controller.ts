@@ -3,12 +3,15 @@ import {
   HttpException,
   HttpStatus,
   ConflictException,
+  ExecutionContext,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { Ctx, Payload } from '@nestjs/microservices/decorators';
 import { RmqContext } from '@nestjs/microservices/ctx-host';
 import { CreateUserDto, SharedService, LoginDto } from '@app/shared';
+import { JwtGuard } from '../../../libs/shared/src/guards/jwt.guard';
 
 @Controller()
 export class AuthController {
@@ -32,8 +35,6 @@ export class AuthController {
     try {
       this.sharedService.sendRmqAck(ctx);
 
-      console.log(payload);
-
       const newUser = await this.authService.createUser(payload);
 
       if (!newUser) throw new ConflictException('Invalid Email or Password!!');
@@ -45,11 +46,11 @@ export class AuthController {
   }
 
   @MessagePattern({ cmd: 'login' })
-  async loginUser(@Ctx() ctx: RmqContext, @Payload() payload: LoginDto) {
+  async loginUserProcess(@Ctx() ctx: RmqContext, @Payload() payload: LoginDto) {
     try {
       this.sharedService.sendRmqAck(ctx);
 
-      return this.authService.varifiedUserInfo(payload);
+      return this.authService.handleLoginProccess(payload);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -62,6 +63,7 @@ export class AuthController {
   ) {
     try {
       this.sharedService.sendRmqAck(ctx);
+      console.log(payload);
 
       return this.authService.getUserById(payload.id);
     } catch (error) {

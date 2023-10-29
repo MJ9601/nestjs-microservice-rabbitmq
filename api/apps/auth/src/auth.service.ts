@@ -32,14 +32,8 @@ export class AuthService {
     const user = await this.getUserByEmail(input.email);
     if (user) return false;
 
-    console.log('test-- 35');
-
     const { password, ...rest } = input;
-    console.log({ input, rest, password });
     const hash = await argon.hash(password);
-    console.log(hash);
-
-    console.log('test -- 40');
 
     const newUser = this.userRepository.create({
       ...rest,
@@ -47,7 +41,8 @@ export class AuthService {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    return await this.userRepository.save(newUser);
+    const savedUser = await this.userRepository.save(newUser);
+    return omit(savedUser, 'password');
   }
 
   async varifiedUserInfo(
@@ -65,10 +60,13 @@ export class AuthService {
     const user = await this.varifiedUserInfo(input);
     if (!user) return false;
 
-    const accessToken = await this.jwtService.signAsync(user, {
-      secret: this.configService.get('JWT_SECRET'),
-      expiresIn: '1d',
-    });
+    const accessToken = await this.jwtService.signAsync(
+      { ...user, valid: true },
+      {
+        secret: this.configService.get('JWT_SECRET'),
+        expiresIn: '1d',
+      },
+    );
 
     return { accessToken };
   }

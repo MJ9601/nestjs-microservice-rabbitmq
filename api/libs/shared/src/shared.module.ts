@@ -2,11 +2,11 @@ import { Module, DynamicModule } from '@nestjs/common';
 import { SharedService } from './shared.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
-import { JwtGuard } from './guards';
+import { JwtStrategy } from './stratogy/jwt.stratogy';
 
 @Module({
-  providers: [SharedService, JwtGuard],
-  exports: [SharedService, JwtGuard],
+  providers: [SharedService, JwtStrategy],
+  exports: [SharedService, JwtStrategy],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
